@@ -3,5 +3,9 @@
 !*.*
 !*/
 
+# python bytecode
+*.pyc
+__pycache__
+
 # temporary files
 *.swp
