@@ -2,6 +2,10 @@
 
 from enum import IntEnum
 
+import copy
+
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
 import numpy as np
 
 import grapes.state.errors as errors
@@ -55,3 +59,45 @@ class Vine:
     def move(self, x, y):
         self.place(x, y)
         self.next()
+
+    def draw(self):
+        board = plt.figure(figsize=(4, 4), facecolor='w')
+        grid = board.add_subplot(
+            111,
+            xticks=range(self.size),
+            yticks=range(self.size),
+            position=[0.1, 0.1, 0.8, 0.8],
+        )
+        grid.grid(color='k', linestyle='-', linewidth=1)
+        grid.xaxis.set_tick_params(bottom=False, top=False, labelbottom=False)
+        grid.yaxis.set_tick_params(left=False, right=False, labelleft=False)
+
+        black = patches.Circle(
+            (0, 0),
+            0.4,
+            facecolor='k',
+            edgecolor='k',
+            linewidth=1,
+            clip_on=False,
+            zorder=4,
+        )
+        white = patches.Circle(
+            (0, 0),
+            0.4,
+            facecolor='w',
+            edgecolor='k',
+            linewidth=1,
+            clip_on=False,
+            zorder=4,
+        )
+
+        for index, point in np.ndenumerate(self.points):
+            if point == Seed.empty:
+                continue
+
+            seed = black if point == Seed.black else white
+            s = copy.copy(seed)
+            s.center = index
+            grid.add_patch(s)
+
+        board.show()
