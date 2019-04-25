@@ -1,5 +1,9 @@
 # pylint: disable=missing-docstring,invalid-name
 
+import copy
+
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
 import numpy as np
 
 import grapes.state.errors as errors
@@ -37,3 +41,45 @@ class Vine:
         self.insert(x, y)
 
         self.next()
+
+    def draw(self):
+        game = plt.figure(figsize=(4, 4), facecolor='w')
+        grid = game.add_subplot(
+            111,
+            xticks=range(self.size),
+            yticks=range(self.size),
+            position=[0.1, 0.1, 0.8, 0.8],
+        )
+        grid.grid(color='k', linestyle='-', linewidth=1)
+        grid.xaxis.set_tick_params(bottom=False, top=False, labelbottom=False)
+        grid.yaxis.set_tick_params(left=False, right=False, labelleft=False)
+
+        black = patches.Circle(
+            (0, 0),
+            0.4,
+            facecolor='k',
+            edgecolor='k',
+            linewidth=1,
+            clip_on=False,
+            zorder=4,
+        )
+        white = patches.Circle(
+            (0, 0),
+            0.4,
+            facecolor='w',
+            edgecolor='k',
+            linewidth=1,
+            clip_on=False,
+            zorder=4,
+        )
+
+        for index, point in np.ndenumerate(self.data):
+            if point == seed.EMPTY:
+                continue
+
+            patch = black if point == seed.BLACK else white
+            stone = copy.copy(patch)
+            stone.center = index
+            grid.add_patch(stone)
+
+        game.show()
