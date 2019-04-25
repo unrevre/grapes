@@ -54,23 +54,40 @@ class Vine:
 
         return points
 
-    def bunch(self, x, y):
+    def opposites(self, x, y):
+        return [
+            (r, s)
+            for (r, s) in self.adjacent(x, y)
+            if self.points[r][s] == self.seed.invert()
+        ]
+
+    def group(self, x, y):
         if self.points[x][y] == Seed.empty:
             raise errors.EmptyPoint((x, y))
 
         colour = self.points[x][y]
 
         bunch = set()
+        breath = set()
         queue = [(x, y)]
         while queue:
             (r, s) = queue.pop()
             bunch.add((r, s))
 
             for (p, q) in self.adjacent(r, s):
-                if (p, q) not in bunch and self.points[p][q] == colour:
-                    queue.append((p, q))
+                if (p, q) not in bunch:
+                    if self.points[p][q] == Seed.empty:
+                        breath.add((p, q))
+                    if self.points[p][q] == colour:
+                        queue.append((p, q))
 
-        return bunch
+        return bunch, breath
+
+    def bunch(self, x, y):
+        return self.group(x, y)[0]
+
+    def breath(self, x, y):
+        return self.group(x, y)[1]
 
     def next(self):
         self.seed = self.seed.invert()
@@ -96,6 +113,10 @@ class Vine:
 
     def move(self, x, y):
         self.place(x, y)
+        for (r, s) in self.opposites(x, y):
+            if not self.breath(r, s):
+                self.pluck(r, s)
+
         self.next()
 
     def draw(self):
