@@ -106,3 +106,27 @@ def test_vine_remove(grapevine):
     grapevine.insert(1, 1)
     grapevine.remove(0, 0)
     assert grapevine.__str__() == ref_vine_remove[1:-1]
+
+def test_vine_move_illegal(grapevine):
+    grapevine.move(0, 0)
+    grapevine.move(1, 0)
+    grapevine.move(1, 1)
+    grapevine.move(0, 1)
+    import grapes.state.errors as errors
+    with pytest.raises(errors.IllegalMove):
+        grapevine.move(0, 0)
+
+ref_vine_move_capture_priority = """
+|b w    |
+|  b    |
+|b      |
+|       |
+"""
+
+def test_vine_move_capture_priority(grapevine):
+    grapevine.move(2, 0)
+    grapevine.move(1, 0)
+    grapevine.move(1, 1)
+    grapevine.move(0, 1)
+    grapevine.move(0, 0)
+    assert grapevine.__str__() == ref_vine_move_capture_priority[1:-1]

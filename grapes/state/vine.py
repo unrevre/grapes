@@ -86,6 +86,12 @@ class Vine:
                     for (p, q) in group:
                         self.remove(p, q)
 
+        if all(
+            self.data[r][s] != seed.EMPTY for (r, s) in self.adjacent(x, y)
+        ):
+            if not self.group(x, y)[1]:
+                raise errors.IllegalMove((x, y))
+
         self.next()
 
     def draw(self):

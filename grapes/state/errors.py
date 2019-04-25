@@ -21,3 +21,9 @@ class EmptyPoint(GrapeError):
     def __init__(self, point):
         message = 'Point {} on board is empty'.format(point)
         super().__init__(message)
+
+
+class IllegalMove(GrapeError):
+    def __init__(self, point):
+        message = 'Illegal move at point {}'.format(point)
+        super().__init__(message)
