@@ -25,6 +25,35 @@ class Vine:
             ]
         )
 
+    def adjacent(self, x, y):
+        adj = []
+        compass = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        for (r, s) in compass:
+            p, q = x + r, y + s
+            if not (min(p, q) < 0 or max(p, q) >= self.size):
+                adj.append((p, q))
+
+        return adj
+
+    def group(self, x, y):
+        if self.data[x][y] == seed.EMPTY:
+            raise errors.EmptyPoint((x, y))
+
+        colour = self.data[x][y]
+
+        group = set()
+        queue = [(x, y)]
+        while queue:
+            (r, s) = queue.pop()
+
+            group.add((r, s))
+
+            for (p, q) in self.adjacent(r, s):
+                if (p, q) not in group and self.data[p][q] == colour:
+                    queue.append((p, q))
+
+        return group
+
     def next(self):
         self.seed = seed.inverse(self.seed)
 
@@ -36,6 +65,12 @@ class Vine:
             raise errors.FilledPoint((x, y), self.data[x][y])
 
         self.data[x][y] = self.seed
+
+    def remove(self, x, y):
+        if self.data[x][y] == seed.EMPTY:
+            raise errors.EmptyPoint((x, y))
+
+        self.data[x][y] = seed.EMPTY
 
     def move(self, x, y):
         self.insert(x, y)

@@ -15,3 +15,9 @@ class FilledPoint(GrapeError):
     def __init__(self, point, seed):
         message = 'Point {} on board filled by {}'.format(point, seed)
         super().__init__(message)
+
+
+class EmptyPoint(GrapeError):
+    def __init__(self, point):
+        message = 'Point {} on board is empty'.format(point)
+        super().__init__(message)
