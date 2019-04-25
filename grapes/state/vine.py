@@ -42,6 +42,7 @@ class Vine:
         colour = self.data[x][y]
 
         group = set()
+        space = set()
         queue = [(x, y)]
         while queue:
             (r, s) = queue.pop()
@@ -49,10 +50,13 @@ class Vine:
             group.add((r, s))
 
             for (p, q) in self.adjacent(r, s):
-                if (p, q) not in group and self.data[p][q] == colour:
-                    queue.append((p, q))
+                if (p, q) not in group:
+                    if self.data[p][q] == seed.EMPTY:
+                        space.add((p, q))
+                    if self.data[p][q] == colour:
+                        queue.append((p, q))
 
-        return group
+        return group, space
 
     def next(self):
         self.seed = seed.inverse(self.seed)
@@ -74,6 +78,13 @@ class Vine:
 
     def move(self, x, y):
         self.insert(x, y)
+
+        for (r, s) in self.adjacent(x, y):
+            if self.data[r][s] == seed.inverse(self.seed):
+                group, space = self.group(r, s)
+                if not space:
+                    for (p, q) in group:
+                        self.remove(p, q)
 
         self.next()
 
