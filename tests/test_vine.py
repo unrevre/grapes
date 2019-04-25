@@ -139,6 +139,45 @@ def test_vine_pluck(grapevine):
     grapevine.pluck(1, 1)
     assert grapevine.__str__() == ref_vine_pluck
 
+def test_vine_move_illegal(grapevine):
+    grapevine.move(0, 0)
+    grapevine.move(1, 0)
+    grapevine.move(1, 1)
+    grapevine.move(0, 1)
+    import grapes.state.errors as errors
+    with pytest.raises(errors.IllegalMove):
+        grapevine.move(0, 0)
+
+ref_vine_move_capture_priority = """  grape vine of size 19
+
+[[1 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]]"""
+
+def test_vine_move_capture_priority(grapevine):
+    grapevine.move(2, 0)
+    grapevine.move(1, 0)
+    grapevine.move(1, 1)
+    grapevine.move(0, 1)
+    grapevine.move(0, 0)
+    assert grapevine.__str__() == ref_vine_move_capture_priority
+
 ref_vine_move = """  grape vine of size 19
 
 [[0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]

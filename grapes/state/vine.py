@@ -126,6 +126,9 @@ class Vine:
             if not self.breath(r, s):
                 self.pluck(r, s)
 
+        if not self.breath(x, y):
+            raise errors.IllegalMove((x, y))
+
         self.cache.clear()
         self.next()
 

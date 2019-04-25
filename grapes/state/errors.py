@@ -29,3 +29,11 @@ class EmptyPoint(GrapeError):
         super().__init__(message)
 
         self.point = point
+
+
+class IllegalMove(GrapeError):
+    def __init__(self, point):
+        message = 'Illegal move at {}'.format(point)
+        super().__init__(message)
+
+        self.point = point
