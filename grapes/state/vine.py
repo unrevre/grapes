@@ -35,6 +35,7 @@ class Vine:
         self.size = size
         self.points = np.empty((self.size, self.size), dtype=np.int)
         self.seed = Seed.black
+        self.cache = {}
 
         self.clear()
 
@@ -43,6 +44,7 @@ class Vine:
 
     def clear(self):
         self.points.fill(Seed.empty)
+        self.cache.clear()
 
     def adjacent(self, x, y):
         points = []
@@ -81,13 +83,20 @@ class Vine:
                     if self.points[p][q] == colour:
                         queue.append((p, q))
 
+        self.cache[(x, y)] = (bunch, breath)
         return bunch, breath
 
     def bunch(self, x, y):
-        return self.group(x, y)[0]
+        try:
+            return self.cache[(x, y)][0]
+        except KeyError:
+            return self.group(x, y)[0]
 
     def breath(self, x, y):
-        return self.group(x, y)[1]
+        try:
+            return self.cache[(x, y)][1]
+        except KeyError:
+            return self.group(x, y)[1]
 
     def next(self):
         self.seed = self.seed.invert()
@@ -117,6 +126,7 @@ class Vine:
             if not self.breath(r, s):
                 self.pluck(r, s)
 
+        self.cache.clear()
         self.next()
 
     def draw(self):

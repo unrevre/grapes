@@ -57,10 +57,12 @@ def test_vine_bunch(grapevine):
     assert grapevine.bunch(1, 2) == set([(1, 2)])
     grapevine.next()
     grapevine.place(1, 1)
+    grapevine.cache.clear()
     assert grapevine.bunch(0, 0) == set([(0, 0), (0, 1)])
     assert grapevine.bunch(1, 1) == set([(1, 1)])
     grapevine.next()
     grapevine.place(0, 2)
+    grapevine.cache.clear()
     assert grapevine.bunch(0, 0) == set([(0, 0), (0, 1), (0, 2), (1, 2)])
 
 def test_vine_breath(grapevine):
