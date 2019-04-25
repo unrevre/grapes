@@ -21,3 +21,11 @@ class FilledPoint(GrapeError):
 
         self.point = point
         self.seed = seed
+
+
+class EmptyPoint(GrapeError):
+    def __init__(self, point):
+        message = 'Point {} on board is empty'.format(point)
+        super().__init__(message)
+
+        self.point = point

@@ -44,6 +44,34 @@ class Vine:
     def clear(self):
         self.points.fill(Seed.empty)
 
+    def adjacent(self, x, y):
+        points = []
+        compass = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        for (r, s) in compass:
+            p, q = x + r, y + s
+            if not (min(p, q) < 0 or max(p, q) >= self.size):
+                points.append((p, q))
+
+        return points
+
+    def bunch(self, x, y):
+        if self.points[x][y] == Seed.empty:
+            raise errors.EmptyPoint((x, y))
+
+        colour = self.points[x][y]
+
+        bunch = set()
+        queue = [(x, y)]
+        while queue:
+            (r, s) = queue.pop()
+            bunch.add((r, s))
+
+            for (p, q) in self.adjacent(r, s):
+                if (p, q) not in bunch and self.points[p][q] == colour:
+                    queue.append((p, q))
+
+        return bunch
+
     def next(self):
         self.seed = self.seed.invert()
 
@@ -55,6 +83,16 @@ class Vine:
             raise errors.FilledPoint((x, y), self.points[x][y])
 
         self.points[x][y] = self.seed
+
+    def remove(self, x, y):
+        if self.points[x][y] == Seed.empty:
+            raise errors.EmptyPoint((x, y))
+
+        self.points[x][y] = Seed.empty
+
+    def pluck(self, x, y):
+        for (r, s) in self.bunch(x, y):
+            self.remove(r, s)
 
     def move(self, x, y):
         self.place(x, y)
