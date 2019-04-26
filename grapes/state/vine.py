@@ -58,6 +58,11 @@ class Vine:
 
         return group, space
 
+    def buds(self):
+        for index, point in np.ndenumerate(self.data):
+            if point == seed.EMPTY:
+                yield index
+
     def next(self):
         self.seed = seed.inverse(self.seed)
 

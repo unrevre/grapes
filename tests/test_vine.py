@@ -89,6 +89,13 @@ def test_vine_space(grapevine):
     assert grapevine.group(0, 0)[1] == set([(0, 2), (1, 0)])
     assert grapevine.group(1, 1)[1] == set([(1, 0), (1, 2), (2, 1)])
 
+def test_vine_buds(grapevine):
+    size = grapevine.size * grapevine.size
+    assert len(list(grapevine.buds())) == size
+    grapevine.insert(0, 1)
+    grapevine.insert(1, 0)
+    assert len(list(grapevine.buds())) == size - 2
+
 def test_vine_remove_empty(grapevine):
     import grapes.state.errors as errors
     with pytest.raises(errors.EmptyPoint):
