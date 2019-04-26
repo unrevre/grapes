@@ -98,6 +98,11 @@ class Vine:
         except KeyError:
             return self.group(x, y)[1]
 
+    def buds(self):
+        for index, point in np.ndenumerate(self.points):
+            if point == Seed.empty:
+                yield index
+
     def next(self):
         self.seed = self.seed.invert()
 

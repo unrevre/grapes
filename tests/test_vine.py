@@ -73,6 +73,12 @@ def test_vine_breath(grapevine):
     assert grapevine.breath(0, 0) == set([(0, 2), (1, 0)])
     assert grapevine.breath(1, 1) == set([(1, 0), (1, 2), (2, 1)])
 
+def test_vine_buds(grapevine):
+    assert sum(1 for _ in grapevine.buds()) == grapevine.size ** 2
+    grapevine.place(0, 1)
+    grapevine.place(1, 0)
+    assert sum(1 for _ in grapevine.buds()) == grapevine.size ** 2 - 2
+
 def test_vine_remove_empty(grapevine):
     import grapes.state.errors as errors
     with pytest.raises(errors.EmptyPoint):
