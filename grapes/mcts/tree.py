@@ -50,14 +50,16 @@ class GrapeTree:
         for x, y in self.vine.buds():
             try:
                 self.children.append(GrapeTree(self, x, y))
+                self.children[-1].p = 1.
             except errors.IllegalMove:
                 pass
 
         if not self.children:
             return self
 
+        norm = sum(child.p for child in self.children)
         for child in self.children:
-            child.p = 1. / len(self.children)
+            child.p /= norm
 
         p = np.fromiter((child.p for child in self.children), dtype=float)
         return self.children[np.argmax(p)]
