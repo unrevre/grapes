@@ -44,13 +44,13 @@ class GrapeTree:
 
         return node
 
-    def expand(self):
+    def expand(self, policy):
         self.children = []
 
         for x, y in self.vine.buds():
             try:
                 self.children.append(GrapeTree(self, x, y))
-                self.children[-1].p = 1.
+                self.children[-1].p = policy.assign(self.vine, x, y)
             except errors.IllegalMove:
                 pass
 
