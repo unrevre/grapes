@@ -20,14 +20,14 @@ class Seed(IntEnum):
         super().__init__()
         self.colour = colour
 
-    def invert(self):
-        inverse = {self.black: self.white, self.white: self.black}
-
-        try:
-            return inverse[self.colour]
-        except KeyError:
-            print('Empty points cannot be inverted')
-            raise
+    @property
+    def inverse(self):
+        opposites = {
+            self.empty: self.empty,
+            self.black: self.white,
+            self.white: self.black,
+        }
+        return opposites[self.colour]
 
 
 class Vine:
@@ -60,7 +60,7 @@ class Vine:
         return [
             (r, s)
             for (r, s) in self.adjacent(x, y)
-            if self.points[r][s] == self.seed.invert()
+            if self.points[r][s] == self.seed.inverse
         ]
 
     def group(self, x, y):
@@ -104,7 +104,7 @@ class Vine:
                 yield index
 
     def next(self):
-        self.seed = self.seed.invert()
+        self.seed = self.seed.inverse
 
     def place(self, x, y):
         if min(x, y) < 0 or max(x, y) >= self.size:
