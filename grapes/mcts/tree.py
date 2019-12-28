@@ -24,6 +24,7 @@ class GrapeTree:
 
         self.connect(x, y)
 
+    @property
     def action(self):
         return self.q + GrapeTree.C * self.p / (1 + self.n)
 
@@ -38,7 +39,7 @@ class GrapeTree:
         node = self
         while node.children is not None:
             u = np.fromiter(
-                (child.action() for child in node.children), dtype=float
+                (child.action for child in node.children), dtype=float
             )
             node = node.children[np.argmax(u)]
 
