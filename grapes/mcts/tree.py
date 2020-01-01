@@ -43,7 +43,7 @@ class Tree:
 
         for x, y in self.vine.buds():
             try:
-                vine = copy.deepcopy(self.vine)
+                vine = copy.copy(self.vine)
                 vine.move(x, y)
 
                 node = Tree(self, (x, y), vine)

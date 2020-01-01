@@ -25,6 +25,15 @@ class Vine:
             ]
         )
 
+    def __copy__(self):
+        result = self.__new__(self.__class__)
+
+        result.size = self.size
+        result.seed = self.seed
+        result.data = self.data.copy()
+
+        return result
+
     def adjacent(self, x, y):
         adj = []
         compass = [(1, 0), (0, 1), (-1, 0), (0, -1)]
