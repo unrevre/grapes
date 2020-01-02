@@ -5,6 +5,7 @@ import copy
 import numpy as np
 
 import grapes.state.errors as errors
+import grapes.state.seed as seed
 
 
 class Tree:
@@ -20,6 +21,54 @@ class Tree:
         self.action = action
         self.parent = parent
         self.children = []
+
+    def info(self, key):
+        if key == 'side':
+            return (
+                '[{}]'.format(
+                    seed.abbr(seed.inverse(self.vine.seed))
+                )
+                if self.action is not None
+                else '[ ]'
+            )
+
+        if key == 'action':
+            return (
+                '[{: 2}][{: 2}]'.format(*self.action)
+                if self.action is not None
+                else '[  ][  ]'
+            )
+
+        if key == 'self':
+            return '{} {} {: .4f} {: .4f}                 [{: 5}]'.format(
+                self.info('side'),
+                self.info('action'),
+                self.p,
+                self.q,
+                self.n,
+            )
+
+        if key == 'info':
+            q, p, n = zip(*((node.q, node.p, node.n) for node in self.children))
+            u = Tree.C * np.asarray(p) * np.sqrt(self.n) / (1 + np.asarray(n))
+
+            return '\n'.join(
+                '    {} {: .4f} {: .4f} {: .4f} {: .4f} [{: 5}]'.format(
+                    node.info('action'),
+                    p[i],
+                    q[i],
+                    u[i],
+                    q[i] + u[i],
+                    n[i],
+                )
+                for i, node in enumerate(self.children)
+            )
+
+        if key == 'div':
+            return '----------------------------------------------------'
+
+    def __str__(self):
+        return '\n'.join([self.info(key) for key in ['self', 'div', 'info']])
 
     @property
     def next(self):
