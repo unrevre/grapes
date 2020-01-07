@@ -121,3 +121,14 @@ class Tree:
             node = node.parent
 
             value = -value
+
+    def trace(self):
+        print(node.vine, '\n')
+
+        node = self
+        while node.children:
+            node = node.next
+
+            print(node.info('self'))
+
+        print(node.vine, '\n')
