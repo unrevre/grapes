@@ -32,7 +32,7 @@ class Vine:
 
         result.size = self.size
         result.seed = self.seed
-        result.hash = self.hash
+        result.hash = copy.copy(self.hash)
         result.data = self.data.copy()
 
         return result
@@ -76,6 +76,7 @@ class Vine:
                 yield index
 
     def next(self):
+        self.hash.next()
         self.seed = seed.inverse(self.seed)
 
     def insert(self, x, y):
@@ -110,6 +111,9 @@ class Vine:
         ):
             if not self.group(x, y)[1]:
                 raise errors.IllegalMove((x, y))
+
+        if not self.hash.legal():
+            raise errors.IllegalMove((x, y))
 
         self.next()
 

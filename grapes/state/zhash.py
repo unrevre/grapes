@@ -14,6 +14,24 @@ class ZHash:
         self.data = rng.integers(MAXINT, size=(3, size, size), dtype=np.uint32)
 
         self.hash = self.base
+        self.history = []
+
+    def __copy__(self):
+        result = self.__new__(self.__class__)
+
+        result.base = self.base
+        result.data = self.data
+
+        result.hash = self.hash
+        result.history = self.history[:]
+
+        return result
+
+    def next(self):
+        self.history.append(self.hash)
 
     def update(self, seed, x, y):
         self.hash ^= self.data[seed][x][y]
+
+    def legal(self):
+        return self.hash not in self.history

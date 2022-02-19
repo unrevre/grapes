@@ -145,3 +145,14 @@ def test_vine_zhash(grapevine):
     grapevine.remove(0, 1)
     grapevine.remove(1, 0)
     assert grapevine.hash.hash == ref0
+
+def test_vine_ko_legality(grapevine):
+    grapevine.move(0, 1)
+    grapevine.move(1, 1)
+    grapevine.move(1, 0)
+    grapevine.move(0, 2)
+    grapevine.move(1, 2)
+    grapevine.move(0, 0)
+    import grapes.state.errors as errors
+    with pytest.raises(errors.IllegalMove):
+        grapevine.move(0, 1)
