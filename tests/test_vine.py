@@ -137,3 +137,11 @@ def test_vine_move_capture_priority(grapevine):
     grapevine.move(0, 1)
     grapevine.move(0, 0)
     assert grapevine.__str__() == ref_vine_move_capture_priority[1:-1]
+
+def test_vine_zhash(grapevine):
+    ref0 = grapevine.hash.hash
+    grapevine.insert(0, 1)
+    grapevine.insert(1, 0)
+    grapevine.remove(0, 1)
+    grapevine.remove(1, 0)
+    assert grapevine.hash.hash == ref0

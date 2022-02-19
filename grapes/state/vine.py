@@ -8,12 +8,14 @@ import numpy as np
 
 import grapes.state.errors as errors
 import grapes.state.seed as seed
+import grapes.state.zhash as zhash
 
 
 class Vine:
     def __init__(self, size):
         self.size = size
         self.seed = seed.BLACK
+        self.hash = zhash.ZHash(size)
         self.data = np.zeros((size, size), dtype=int)
 
     def __str__(self):
@@ -30,6 +32,7 @@ class Vine:
 
         result.size = self.size
         result.seed = self.seed
+        result.hash = self.hash
         result.data = self.data.copy()
 
         return result
@@ -82,12 +85,14 @@ class Vine:
         if self.data[x][y] != seed.EMPTY:
             raise errors.FilledPoint((x, y), self.data[x][y])
 
+        self.hash.update(self.seed, x, y)
         self.data[x][y] = self.seed
 
     def remove(self, x, y):
         if self.data[x][y] == seed.EMPTY:
             raise errors.EmptyPoint((x, y))
 
+        self.hash.update(self.data[x][y], x, y)
         self.data[x][y] = seed.EMPTY
 
     def move(self, x, y):
