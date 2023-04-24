@@ -34,7 +34,10 @@ class Tree:
 
         if key == 'action':
             return (
-                '[{: 2}][{: 2}]'.format(*self.action)
+                '[{: 2}][{: 2}]'.format(
+                    self.action // self.vine.size,
+                    self.action % self.vine.size,
+                )
                 if self.action is not None
                 else '[  ][  ]'
             )
@@ -90,13 +93,13 @@ class Tree:
     def expand(self, policy):
         self.children = []
 
-        for x, y in self.vine.buds():
+        for index in self.vine.buds():
             try:
                 vine = copy.copy(self.vine)
-                vine.move(x, y)
+                vine.move(index)
 
-                node = Tree(self, (x, y), vine)
-                node.p = policy[x][y]
+                node = Tree(self, index, vine)
+                node.p = policy[index]
 
                 self.children.append(node)
             except errors.IllegalMove:

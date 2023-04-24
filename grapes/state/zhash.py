@@ -11,7 +11,7 @@ class ZHash:
         rng = np.random.default_rng(0)
 
         self.base = rng.integers(MAXINT, dtype=np.uint32)
-        self.data = rng.integers(MAXINT, size=(3, size, size), dtype=np.uint32)
+        self.data = rng.integers(MAXINT, size=(3, size), dtype=np.uint32)
 
         self.hash = self.base
         self.history = []
@@ -30,8 +30,8 @@ class ZHash:
     def next(self):
         self.history.append(self.hash)
 
-    def update(self, seed, x, y):
-        self.hash ^= self.data[seed][x][y]
+    def update(self, seed, p):
+        self.hash ^= self.data[seed][p]
 
     def legal(self):
         return self.hash not in self.history

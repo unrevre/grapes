@@ -15,8 +15,8 @@ class Vine:
     def __init__(self, size):
         self.size = size
         self.seed = seed.BLACK
-        self.hash = zhash.ZHash(size)
-        self.data = np.zeros((size, size), dtype=int)
+        self.hash = zhash.ZHash(size * size)
+        self.data = np.zeros(size * size, dtype=int)
 
     def __str__(self):
         return '\n'.join(
@@ -37,83 +37,85 @@ class Vine:
 
         return result
 
-    def adjacent(self, x, y):
+    def adjacent(self, p):
         adj = []
-        compass = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        for (r, s) in compass:
-            p, q = x + r, y + s
-            if not (min(p, q) < 0 or max(p, q) >= self.size):
-                adj.append((p, q))
+
+        x = p % self.size
+        if x != 0:
+            adj.append(p - 1)
+        if x != self.size - 1:
+            adj.append(p + 1)
+
+        y = p // self.size
+        if y != 0:
+            adj.append(p - self.size)
+        if y != self.size - 1:
+            adj.append(p + self.size)
 
         return adj
 
-    def group(self, x, y):
-        if self.data[x][y] == seed.EMPTY:
-            raise errors.EmptyPoint((x, y))
+    def group(self, p):
+        if self.data[p] == seed.EMPTY:
+            raise errors.EmptyPoint(p)
 
-        colour = self.data[x][y]
+        colour = self.data[p]
 
         group = set()
         space = set()
-        queue = [(x, y)]
+        queue = [p]
         while queue:
-            (r, s) = queue.pop()
+            q = queue.pop()
 
-            group.add((r, s))
+            group.add(q)
 
-            for (p, q) in self.adjacent(r, s):
-                if (p, q) not in group:
-                    if self.data[p][q] == seed.EMPTY:
-                        space.add((p, q))
-                    if self.data[p][q] == colour:
-                        queue.append((p, q))
+            for r in self.adjacent(q):
+                if r not in group:
+                    if self.data[r] == seed.EMPTY:
+                        space.add(r)
+                    if self.data[r] == colour:
+                        queue.append(r)
 
         return group, space
 
     def buds(self):
-        for index, point in np.ndenumerate(self.data):
+        for (p,), point in np.ndenumerate(self.data):
             if point == seed.EMPTY:
-                yield index
+                yield p
 
     def next(self):
         self.hash.next()
         self.seed = seed.inverse(self.seed)
 
-    def insert(self, x, y):
-        if min(x, y) < 0 or max(x, y) >= self.size:
-            raise errors.InvalidPoint((x, y), self.size)
+    def insert(self, p):
+        if self.data[p] != seed.EMPTY:
+            raise errors.FilledPoint(p, self.data[p])
 
-        if self.data[x][y] != seed.EMPTY:
-            raise errors.FilledPoint((x, y), self.data[x][y])
+        self.hash.update(self.seed, p)
+        self.data[p] = self.seed
 
-        self.hash.update(self.seed, x, y)
-        self.data[x][y] = self.seed
+    def remove(self, p):
+        if self.data[p] == seed.EMPTY:
+            raise errors.EmptyPoint(p)
 
-    def remove(self, x, y):
-        if self.data[x][y] == seed.EMPTY:
-            raise errors.EmptyPoint((x, y))
+        self.hash.update(self.data[p], p)
+        self.data[p] = seed.EMPTY
 
-        self.hash.update(self.data[x][y], x, y)
-        self.data[x][y] = seed.EMPTY
+    def move(self, p):
+        self.insert(p)
 
-    def move(self, x, y):
-        self.insert(x, y)
-
-        for (r, s) in self.adjacent(x, y):
-            if self.data[r][s] == seed.inverse(self.seed):
-                group, space = self.group(r, s)
+        for q in self.adjacent(p):
+            if self.data[q] == seed.inverse(self.seed):
+                group, space = self.group(q)
                 if not space:
-                    for (p, q) in group:
-                        self.remove(p, q)
+                    for r in group:
+                        self.remove(r)
 
-        if all(
-            self.data[r][s] != seed.EMPTY for (r, s) in self.adjacent(x, y)
-        ):
-            if not self.group(x, y)[1]:
-                raise errors.IllegalMove((x, y))
+        if all(self.data[q] != seed.EMPTY for q in self.adjacent(p)):
+            if not self.group(p)[1]:
+                raise errors.IllegalMove(p)
 
         if not self.hash.legal():
-            raise errors.IllegalMove((x, y))
+            raise errors.IllegalMove(p)
 
         self.next()
 
@@ -148,13 +150,16 @@ class Vine:
             zorder=4,
         )
 
-        for index, point in np.ndenumerate(self.data):
+        for (p,), point in np.ndenumerate(self.data):
             if point == seed.EMPTY:
                 continue
 
+            x = p % self.size
+            y = p // self.size
+
             patch = black if point == seed.BLACK else white
             stone = copy.copy(patch)
-            stone.center = index
+            stone.center = (x, y)
             grid.add_patch(stone)
 
         game.show()
