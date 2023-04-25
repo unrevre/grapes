@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring,invalid-name
 
 import copy
+import wine
 
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
@@ -38,21 +39,7 @@ class Vine:
         return result
 
     def adjacent(self, p):
-        adj = []
-
-        x = p % self.size
-        if x != 0:
-            adj.append(p - 1)
-        if x != self.size - 1:
-            adj.append(p + 1)
-
-        y = p // self.size
-        if y != 0:
-            adj.append(p - self.size)
-        if y != self.size - 1:
-            adj.append(p + self.size)
-
-        return adj
+        return wine.adjacent(p, self.size)
 
     def group(self, p):
         colour = self.data[p]

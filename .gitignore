@@ -7,5 +7,8 @@
 *.pyc
 __pycache__
 
+# python build directory
+build
+
 # temporary files
 *.swp
