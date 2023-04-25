@@ -42,24 +42,7 @@ class Vine:
         return wine.adjacent(p, self.size)
 
     def group(self, p):
-        colour = self.data[p]
-
-        group = set()
-        space = set()
-        queue = [p]
-        while queue:
-            q = queue.pop()
-
-            group.add(q)
-
-            for r in self.adjacent(q):
-                if r not in group:
-                    if self.data[r] == seed.EMPTY:
-                        space.add(r)
-                    if self.data[r] == colour:
-                        queue.append(r)
-
-        return group, space
+        return wine.group(p, self.size, self.data)
 
     def buds(self):
         return np.arange(self.data.size)[self.data == seed.EMPTY]
