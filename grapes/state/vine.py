@@ -78,9 +78,7 @@ class Vine:
         return group, space
 
     def buds(self):
-        for (p,), point in np.ndenumerate(self.data):
-            if point == seed.EMPTY:
-                yield p
+        return np.arange(self.data.size)[self.data == seed.EMPTY]
 
     def next(self):
         self.hash.next()
