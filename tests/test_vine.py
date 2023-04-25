@@ -7,12 +7,6 @@ def grapevine():
     import grapes.state.vine as vine
     return vine.Vine(4)
 
-def test_vine_insert_overlap(grapevine):
-    grapevine.insert(1)
-    import grapes.state.errors as errors
-    with pytest.raises(errors.FilledPoint):
-        grapevine.insert(1)
-
 ref_vine_insert = """
 |       |
 |       |
@@ -90,11 +84,6 @@ def test_vine_buds(grapevine):
     grapevine.insert(1)
     grapevine.insert(4)
     assert len(list(grapevine.buds())) == size - 2
-
-def test_vine_remove_empty(grapevine):
-    import grapes.state.errors as errors
-    with pytest.raises(errors.EmptyPoint):
-        grapevine.remove(0)
 
 ref_vine_remove = """
 |       |

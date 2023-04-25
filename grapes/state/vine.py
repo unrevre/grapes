@@ -55,9 +55,6 @@ class Vine:
         return adj
 
     def group(self, p):
-        if self.data[p] == seed.EMPTY:
-            raise errors.EmptyPoint(p)
-
         colour = self.data[p]
 
         group = set()
@@ -85,16 +82,10 @@ class Vine:
         self.seed = seed.inverse(self.seed)
 
     def insert(self, p):
-        if self.data[p] != seed.EMPTY:
-            raise errors.FilledPoint(p, self.data[p])
-
         self.hash.update(self.seed, p)
         self.data[p] = self.seed
 
     def remove(self, p):
-        if self.data[p] == seed.EMPTY:
-            raise errors.EmptyPoint(p)
-
         self.hash.update(self.data[p], p)
         self.data[p] = seed.EMPTY
 
