@@ -67,9 +67,8 @@ class Vine:
         ):
             self.remove(q)
 
-        if all(self.data[q] != seed.EMPTY for q in self.adjacent(p)):
-            if not self.group(p)[1]:
-                raise errors.IllegalMove(p)
+        if wine.illegal(p, self.size, self.seed, self.data):
+            raise errors.IllegalMove(p)
 
         if not self.hash.legal():
             raise errors.IllegalMove(p)

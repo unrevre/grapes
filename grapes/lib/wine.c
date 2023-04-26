@@ -204,12 +204,84 @@ wine_capture(PyObject *self, PyObject *args)
     return result;
 }
 
+static long
+impl_illegal(long p, long size, long c, long *data,
+             long *queue, long *visit, long *space)
+{
+    long j, f, b, q, l, m, n, adj[4];
+
+    l = impl_adjacent(p, size, adj);
+    for (m = 0; m < l; ++m)
+        if (data[adj[m]] == 0)
+            return 0;
+
+    j = 0, f = 0, b = 0;
+
+    queue[0] = p;
+    visit[p] = 1;
+
+    while (f <= b) {
+        q = queue[f++];
+
+        l = impl_adjacent(q, size, adj);
+        for (m = 0; m < l; ++m) {
+            n = adj[m];
+
+            if (visit[n])
+                continue;
+
+            visit[n] = 1;
+
+            if (data[n] == 0)
+                space[j++] = n;
+            if (data[n] == c)
+                queue[++b] = n;
+        }
+    }
+
+    return j == 0;
+}
+
+static PyObject *
+wine_illegal(PyObject *self, PyObject *args)
+{
+    long p, size, c, r;
+    PyObject *obj, *raw;
+
+    if (!PyArg_ParseTuple(args, "lllO!", &p, &size, &c, &PyArray_Type, &obj))
+        return NULL;
+
+    if ((raw = PyArray_FROM_OTF(obj, NPY_LONG, NPY_ARRAY_IN_ARRAY)) == NULL)
+        return NULL;
+
+    npy_intp dims;
+    long *data, *queue, *visit, *space;
+
+    dims = PyArray_DIMS((PyArrayObject*)raw)[0];
+    data = (long *)PyArray_DATA((PyArrayObject*)raw);
+
+    queue = (long *)calloc(dims, sizeof(long));
+    visit = (long *)calloc(dims, sizeof(long));
+    space = (long *)calloc(dims, sizeof(long));
+
+    r = impl_illegal(p, size, c, data, queue, visit, space);
+
+    free(queue);
+    free(visit);
+    free(space);
+
+    if (r) Py_RETURN_TRUE;
+    else Py_RETURN_FALSE;
+}
+
 static PyMethodDef WineMethods[] = {
     {"adjacent", wine_adjacent, METH_VARARGS,
      "vine.adjacent"},
     {"group", wine_group, METH_VARARGS,
      "vine.group"},
     {"capture", wine_capture, METH_VARARGS,
+     ""},
+    {"illegal", wine_illegal, METH_VARARGS,
      ""},
     {NULL, NULL, 0, NULL}
 };
