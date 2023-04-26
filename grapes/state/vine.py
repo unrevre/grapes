@@ -62,12 +62,10 @@ class Vine:
     def move(self, p):
         self.insert(p)
 
-        for q in self.adjacent(p):
-            if self.data[q] == seed.inverse(self.seed):
-                group, space = self.group(q)
-                if not space:
-                    for r in group:
-                        self.remove(r)
+        for q in wine.capture(
+            p, self.size, seed.inverse(self.seed), self.data
+        ):
+            self.remove(q)
 
         if all(self.data[q] != seed.EMPTY for q in self.adjacent(p)):
             if not self.group(p)[1]:

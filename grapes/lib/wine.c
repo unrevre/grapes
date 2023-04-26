@@ -132,11 +132,85 @@ wine_group(PyObject *self, PyObject *args)
     return result;
 }
 
+static long
+impl_capture(long p, long size, long c, long *data, long *output,
+             long *queue, long *visit, long *group, long *space)
+{
+    long cl, gl, sl, i, l, m, n, adj[4];
+
+    cl = 0;
+
+    l = impl_adjacent(p, size, adj);
+    for (m = 0; m < l; ++m) {
+        n = adj[m];
+
+        if (data[n] != c)
+            continue;
+
+        if (visit[n])
+            continue;
+
+        impl_group(n, size, data, &gl, &sl, queue, visit, group, space);
+
+        if (!sl) {
+            for (i = 0; i < gl; ++i)
+                output[cl++] = group[i];
+        }
+    }
+
+    return cl;
+}
+
+static PyObject *
+wine_capture(PyObject *self, PyObject *args)
+{
+    long p, size, c;
+    PyObject *obj, *raw;
+    PyObject *item, *result;
+
+    if (!PyArg_ParseTuple(args, "lllO!", &p, &size, &c, &PyArray_Type, &obj))
+        return NULL;
+
+    if ((raw = PyArray_FROM_OTF(obj, NPY_LONG, NPY_ARRAY_IN_ARRAY)) == NULL)
+        return NULL;
+
+    npy_intp dims;
+    long *data, *queue, *visit, *group, *space, *output;
+    long i, l;
+
+    dims = PyArray_DIMS((PyArrayObject*)raw)[0];
+    data = (long *)PyArray_DATA((PyArrayObject*)raw);
+
+    queue = (long *)calloc(dims, sizeof(long));
+    visit = (long *)calloc(dims, sizeof(long));
+    group = (long *)calloc(dims, sizeof(long));
+    space = (long *)calloc(dims, sizeof(long));
+    output = (long *)calloc(dims, sizeof(long));
+
+    l = impl_capture(p, size, c, data, output, queue, visit, group, space);
+
+    result = PyList_New(l);
+    for (i = 0; i < l; ++i) {
+        item = PyLong_FromLong(output[i]);
+        PyList_SET_ITEM(result, i, item);
+    }
+
+    free(queue);
+    free(visit);
+    free(group);
+    free(space);
+    free(output);
+
+    return result;
+}
+
 static PyMethodDef WineMethods[] = {
     {"adjacent", wine_adjacent, METH_VARARGS,
      "vine.adjacent"},
     {"group", wine_group, METH_VARARGS,
      "vine.group"},
+    {"capture", wine_capture, METH_VARARGS,
+     ""},
     {NULL, NULL, 0, NULL}
 };
 
