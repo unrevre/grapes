@@ -46,13 +46,12 @@ wine_adjacent(PyObject *self, PyObject *args)
 }
 
 static void
-impl_group(long p, long size, long *data, long *gl, long *sl,
+impl_group(long p, long size, long c, long *data, long *gl, long *sl,
            long *queue, long *visit, long *group, long *space)
 {
-    long i, j, f, b, q, l, m, n, c, adj[4];
+    long i, j, f, b, q, l, m, n, adj[4];
 
     i = 0, j = 0, f = 0, b = 0;
-    c = data[p];
 
     queue[0] = p;
     visit[p] = 1;
@@ -84,11 +83,11 @@ impl_group(long p, long size, long *data, long *gl, long *sl,
 static PyObject *
 wine_group(PyObject *self, PyObject *args)
 {
-    long p, size;
+    long p, size, c;
     PyObject *obj, *raw;
     PyObject *item, *rgroup, *rspace, *result;
 
-    if (!PyArg_ParseTuple(args, "llO!", &p, &size, &PyArray_Type, &obj))
+    if (!PyArg_ParseTuple(args, "lllO!", &p, &size, &c, &PyArray_Type, &obj))
         return NULL;
 
     if ((raw = PyArray_FROM_OTF(obj, NPY_LONG, NPY_ARRAY_IN_ARRAY)) == NULL)
@@ -106,7 +105,7 @@ wine_group(PyObject *self, PyObject *args)
     group = (long *)calloc(dims, sizeof(long));
     space = (long *)calloc(dims, sizeof(long));
 
-    impl_group(p, size, data, &gl, &sl, queue, visit, group, space);
+    impl_group(p, size, c, data, &gl, &sl, queue, visit, group, space);
 
     rgroup = PyList_New(gl);
     for (i = 0; i < gl; ++i) {
@@ -150,7 +149,7 @@ impl_capture(long p, long size, long c, long *data, long *output,
         if (visit[n])
             continue;
 
-        impl_group(n, size, data, &gl, &sl, queue, visit, group, space);
+        impl_group(n, size, c, data, &gl, &sl, queue, visit, group, space);
 
         if (!sl) {
             for (i = 0; i < gl; ++i)

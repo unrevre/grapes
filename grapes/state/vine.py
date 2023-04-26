@@ -42,7 +42,7 @@ class Vine:
         return wine.adjacent(p, self.size)
 
     def group(self, p):
-        return wine.group(p, self.size, self.data)
+        return wine.group(p, self.size, self.data[p], self.data)
 
     def buds(self):
         return np.arange(self.data.size)[self.data == seed.EMPTY]
