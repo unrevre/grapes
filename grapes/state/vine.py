@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring,invalid-name
 
 import copy
+import math
 import wine
 
 import matplotlib.patches as patches
@@ -13,8 +14,9 @@ import grapes.state.zhash as zhash
 
 
 class Vine:
-    def __init__(self, size):
+    def __init__(self, size, komi):
         self.size = size
+        self.komi = komi
         self.seed = seed.BLACK
         self.null = 0
         self.hash = zhash.ZHash(size * size)
@@ -33,6 +35,7 @@ class Vine:
         result = self.__new__(self.__class__)
 
         result.size = self.size
+        result.komi = self.komi
         result.seed = self.seed
         result.null = self.null
         result.hash = copy.copy(self.hash)
@@ -47,6 +50,15 @@ class Vine:
     @property
     def complete(self):
         return self.null == 2
+
+    @property
+    def result(self):
+        black = np.sum(self.board == seed.BLACK)
+        white = np.sum(self.board == seed.WHITE)
+
+        value = black - white
+
+        return math.copysign(1.0, value - self.komi)
 
     def adjacent(self, p):
         return wine.adjacent(p, self.size)

@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def grapevine():
     import grapes.state.vine as vine
-    return vine.Vine(4)
+    return vine.Vine(4, 0.5)
 
 ref_vine_insert = """
 |       |
