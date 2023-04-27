@@ -67,10 +67,10 @@ impl_group(long p, long size, long c, long *data, long *gl, long *sl,
             if (visit[n])
                 continue;
 
-            visit[n] = 1;
-
             if (data[n] == 0)
                 space[j++] = n;
+            if (data[n] != 0)
+                visit[n] = 1;
             if (data[n] == c)
                 queue[++b] = n;
         }

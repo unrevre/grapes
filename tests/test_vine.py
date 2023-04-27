@@ -50,6 +50,21 @@ def test_vine_move_1(grapevine):
     grapevine.move(9)
     assert grapevine.__str__() == ref_vine_move_1[1:-1]
 
+ref_vine_move_2 = """
+|  w b  |
+|w b    |
+|       |
+|       |
+"""
+
+def test_vine_move_2(grapevine):
+    grapevine.move(0)
+    grapevine.move(1)
+    grapevine.move(2)
+    grapevine.move(4)
+    grapevine.move(5)
+    assert grapevine.__str__() == ref_vine_move_2[1:-1]
+
 def test_vine_neighbours(grapevine):
     assert sorted(grapevine.adjacent(0)) == [1, 4]
     assert sorted(grapevine.adjacent(4)) == [0, 5, 8]
