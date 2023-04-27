@@ -91,22 +91,19 @@ class Tree:
         return node
 
     def expand(self, policy):
-        self.children = []
+        if self.vine.complete:
+            return
 
         for index in self.vine.buds():
-            try:
-                vine = copy.copy(self.vine)
-                vine.move(index)
+            vine = copy.copy(self.vine)
 
-                node = Tree(self, index, vine)
-                node.p = policy[index]
+            if not vine.move(index):
+                continue
 
-                self.children.append(node)
-            except errors.IllegalMove:
-                pass
+            node = Tree(self, index, vine)
+            node.p = policy[index]
 
-        if not self.children:
-            return
+            self.children.append(node)
 
         norm = sum(node.p for node in self.children)
 

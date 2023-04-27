@@ -80,10 +80,10 @@ def test_vine_space(grapevine):
 
 def test_vine_buds(grapevine):
     size = grapevine.size * grapevine.size
-    assert len(list(grapevine.buds())) == size
+    assert len(list(grapevine.buds())) == size + 1
     grapevine.insert(1)
     grapevine.insert(4)
-    assert len(list(grapevine.buds())) == size - 2
+    assert len(list(grapevine.buds())) == size - 1
 
 ref_vine_remove = """
 |       |
@@ -103,9 +103,7 @@ def test_vine_move_illegal(grapevine):
     grapevine.move(4)
     grapevine.move(5)
     grapevine.move(1)
-    import grapes.state.errors as errors
-    with pytest.raises(errors.IllegalMove):
-        grapevine.move(0)
+    assert grapevine.move(0) == False
 
 ref_vine_move_capture_priority = """
 |b w    |
@@ -137,6 +135,17 @@ def test_vine_ko_legality(grapevine):
     grapevine.move(2)
     grapevine.move(6)
     grapevine.move(0)
-    import grapes.state.errors as errors
-    with pytest.raises(errors.IllegalMove):
-        grapevine.move(1)
+    assert grapevine.move(1) == False
+
+def test_vine_null(grapevine):
+    size = grapevine.size * grapevine.size
+    grapevine.move(0)
+    grapevine.move(5)
+    grapevine.move(16)
+    assert grapevine.null == 1
+    grapevine.move(1)
+    assert grapevine.null == 0
+    grapevine.move(16)
+    assert len(list(grapevine.buds())) == size - 2
+    grapevine.move(16)
+    assert grapevine.null == 2

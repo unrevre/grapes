@@ -16,15 +16,16 @@ class Vine:
     def __init__(self, size):
         self.size = size
         self.seed = seed.BLACK
+        self.null = 0
         self.hash = zhash.ZHash(size * size)
-        self.data = np.zeros(size * size, dtype=int)
+        self.data = np.zeros(size * size + 1, dtype=int)
 
     def __str__(self):
         return '\n'.join(
             '|{}|'.format(r)
             for r in [
                 ' '.join(seed.abbr(c.item()) for c in r)
-                for r in zip(*[np.nditer(self.data)] * self.size)
+                for r in zip(*[np.nditer(self.board)] * self.size)
             ]
         )
 
@@ -33,10 +34,19 @@ class Vine:
 
         result.size = self.size
         result.seed = self.seed
+        result.null = self.null
         result.hash = copy.copy(self.hash)
         result.data = self.data.copy()
 
         return result
+
+    @property
+    def board(self):
+        return self.data[:-1]
+
+    @property
+    def complete(self):
+        return self.null == 2
 
     def adjacent(self, p):
         return wine.adjacent(p, self.size)
@@ -60,20 +70,27 @@ class Vine:
         self.data[p] = seed.EMPTY
 
     def move(self, p):
-        self.insert(p)
+        if p == self.board.size:
+            self.null += 1
+        else:
+            self.insert(p)
 
-        for q in wine.capture(
-            p, self.size, seed.inverse(self.seed), self.data
-        ):
-            self.remove(q)
+            for q in wine.capture(
+                p, self.size, seed.inverse(self.seed), self.data
+            ):
+                self.remove(q)
 
-        if wine.illegal(p, self.size, self.seed, self.data):
-            raise errors.IllegalMove(p)
+            if wine.illegal(p, self.size, self.seed, self.data):
+                return False
 
-        if not self.hash.legal():
-            raise errors.IllegalMove(p)
+            if not self.hash.legal():
+                return False
+
+            self.null = 0
 
         self.next()
+
+        return True
 
     def draw(self):
         game = plt.figure(figsize=(4, 4), facecolor='w')
@@ -106,7 +123,7 @@ class Vine:
             zorder=4,
         )
 
-        for (p,), point in np.ndenumerate(self.data):
+        for (p,), point in np.ndenumerate(self.board):
             if point == seed.EMPTY:
                 continue
 
