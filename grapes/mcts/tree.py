@@ -74,6 +74,13 @@ class Tree:
         return '\n'.join([self.info(key) for key in ['self', 'div', 'info']])
 
     @property
+    def state(self):
+        index, n = zip(*((node.action, node.n) for node in self.children))
+        index, n = np.asarray(index, dtype=int), np.asarray(n, dtype=float)
+
+        return np.swapaxes(self.vine.state, 0, -1), (index, n / np.sum(n))
+
+    @property
     def next(self):
         q, p, n = zip(*((node.q, node.p, node.n) for node in self.children))
         q, p, n = np.asarray(q), np.asarray(p), np.asarray(n)

@@ -14,13 +14,17 @@ import grapes.state.zhash as zhash
 
 
 class Vine:
-    def __init__(self, size, komi):
+    def __init__(self, size, depth, komi):
         self.size = size
         self.komi = komi
         self.seed = seed.BLACK
         self.null = 0
         self.hash = zhash.ZHash(size * size)
         self.data = np.zeros(size * size + 1, dtype=int)
+
+        self.depth = depth
+        self.state = np.zeros((depth * 2 + 1, size * size), dtype=int)
+        self.state[-1] = seed.BLACK
 
     def __str__(self):
         return '\n'.join(
@@ -41,6 +45,9 @@ class Vine:
         result.hash = copy.copy(self.hash)
         result.data = self.data.copy()
 
+        result.depth = self.depth
+        result.state = self.state.copy()
+
         return result
 
     @property
@@ -59,6 +66,21 @@ class Vine:
         value = black - white
 
         return math.copysign(1.0, value - self.komi)
+
+    def update(self):
+        index = np.arange(self.depth * 2, dtype=int)
+        shift = index[index % self.depth != 0]
+        order = np.concatenate(np.split(index, 2)[::-1])
+
+        self.state[shift] = self.state[shift - 1]
+        self.state[index] = self.state[order]
+
+        black = self.board == seed.BLACK
+        white = self.board == seed.WHITE
+        seeds = [black, white][::self.seed]
+
+        self.state[[0, self.depth]] = seeds
+        self.state[-1] ^= 1
 
     def adjacent(self, p):
         return wine.adjacent(p, self.size)

@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture
 def grapevine():
     import grapes.state.vine as vine
-    return vine.Vine(4, 0.5)
+    return vine.Vine(4, 8, 0.5)
 
 ref_vine_insert = """
 |       |
@@ -164,3 +164,26 @@ def test_vine_null(grapevine):
     assert len(list(grapevine.buds())) == size - 2
     grapevine.move(16)
     assert grapevine.null == 2
+
+ref_vine_state_b = """[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]"""
+ref_vine_state_w = """[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]"""
+ref_vine_state_0 = """[0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0]"""
+ref_vine_state_1 = """[0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0]"""
+ref_vine_state_2 = """[0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0]"""
+
+def test_vine_state(grapevine):
+    assert grapevine.state[-1].__str__() == ref_vine_state_b
+    grapevine.move(1)
+    grapevine.update()
+    assert grapevine.state[-1].__str__() == ref_vine_state_w
+    assert grapevine.state[8].__str__() == ref_vine_state_0
+    grapevine.move(2)
+    grapevine.update()
+    assert grapevine.state[-1].__str__() == ref_vine_state_b
+    assert grapevine.state[0].__str__() == ref_vine_state_0
+    assert grapevine.state[8].__str__() == ref_vine_state_1
+    grapevine.move(3)
+    grapevine.update()
+    assert grapevine.state[-1].__str__() == ref_vine_state_w
+    assert grapevine.state[8].__str__() == ref_vine_state_2
+    assert grapevine.state[0].__str__() == ref_vine_state_1
