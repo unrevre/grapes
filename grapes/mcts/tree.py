@@ -129,6 +129,15 @@ class Tree:
 
             value = -value
 
+    def smear(self, alpha, frac):
+        p = np.fromiter((node.p for node in self.children), dtype=float)
+        noise = np.random.dirichlet(np.full(p.shape, alpha, dtype=float))
+
+        prob = p * (1.0 - frac) + noise * frac
+
+        for i, node in enumerate(self.children):
+            node.p = prob[i]
+
     def trace(self):
         print(node.vine, '\n')
 
