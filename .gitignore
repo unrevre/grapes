@@ -3,6 +3,11 @@
 !*.*
 !*/
 
+# tensorflow data
+*.pb
+*.index
+*.data-*-of-*
+
 # python bytecode
 *.pyc
 __pycache__
