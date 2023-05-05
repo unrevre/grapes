@@ -63,7 +63,7 @@ class Vine:
         black = np.sum(self.board == seed.BLACK)
         white = np.sum(self.board == seed.WHITE)
 
-        value = black - white
+        value = black - white + self.area()
 
         return math.copysign(1.0, value - self.komi)
 
@@ -87,6 +87,12 @@ class Vine:
 
     def group(self, p):
         return wine.group(p, self.size, self.data[p], self.data)
+
+    def area(self):
+        index = np.arange(self.board.size)
+        empty = list(index[self.board == seed.EMPTY])
+
+        return wine.area(self.size, self.data, empty)
 
     def buds(self):
         return np.arange(self.data.size)[self.data == seed.EMPTY]

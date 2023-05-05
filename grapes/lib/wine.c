@@ -273,6 +273,95 @@ wine_illegal(PyObject *self, PyObject *args)
     else Py_RETURN_FALSE;
 }
 
+static long
+impl_area(long size, long *data, PyObject *list, long *queue, long *visit) {
+    Py_ssize_t len;
+    long s, c[3], diff;
+    long i, f, b, l, m, n, p, q, adj[4];
+
+    diff = 0;
+
+    len = PyList_GET_SIZE(list);
+    for (i = 0; i < len; ++i) {
+        p = PyLong_AsLong(PyList_GET_ITEM(list, i));
+
+        if (visit[p])
+            continue;
+
+        f = 0, b = 0, s = 1;
+        c[0] = 0, c[1] = 0;
+
+        queue[0] = p;
+        visit[p] = 1;
+
+        while (f <= b) {
+            q = queue[f++];
+
+            l = impl_adjacent(q, size, adj);
+            for (m = 0; m < l; ++m) {
+                n = adj[m];
+
+                if (visit[n])
+                    continue;
+
+                switch (data[n]) {
+                    case 0:
+                        queue[++b] = n;
+                        visit[n] = 1;
+                        ++s;
+                        break;
+                    case 1:
+                        ++c[0];
+                        break;
+                    case -1:
+                        ++c[1];
+                        break;
+                }
+            }
+        }
+
+        if (c[0] + c[1] != 0) {
+            if (c[0] == 0)
+                diff -= s;
+            if (c[1] == 0)
+                diff += s;
+        }
+    }
+
+    return diff;
+}
+
+static PyObject *
+wine_area(PyObject *self, PyObject *args)
+{
+    long size;
+    PyObject *obj, *list, *raw;
+    PyObject *result;
+
+    if (!PyArg_ParseTuple(args, "lO!O!", &size, &PyArray_Type, &obj,
+                          &PyList_Type, &list))
+        return NULL;
+
+    if ((raw = PyArray_FROM_OTF(obj, NPY_LONG, NPY_ARRAY_IN_ARRAY)) == NULL)
+        return NULL;
+
+    npy_intp dims;
+    long *data, *queue, *visit;
+
+    dims = PyArray_DIMS((PyArrayObject*)raw)[0];
+    data = (long *)PyArray_DATA((PyArrayObject*)raw);
+
+    queue = (long *)calloc(dims, sizeof(long));
+    visit = (long *)calloc(dims, sizeof(long));
+
+    result = PyLong_FromLong(impl_area(size, data, list, queue, visit));
+
+    free(queue);
+    free(visit);
+
+    return result;
+}
+
 static PyMethodDef WineMethods[] = {
     {"adjacent", wine_adjacent, METH_VARARGS,
      "vine.adjacent"},
@@ -282,6 +371,8 @@ static PyMethodDef WineMethods[] = {
      ""},
     {"illegal", wine_illegal, METH_VARARGS,
      ""},
+    {"area", wine_area, METH_VARARGS,
+     "vine.area"},
     {NULL, NULL, 0, NULL}
 };
 

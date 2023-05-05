@@ -93,6 +93,29 @@ def test_vine_space(grapevine):
     assert sorted(grapevine.group(0)[1]) == [2, 4]
     assert sorted(grapevine.group(5)[1]) == [4, 6, 9]
 
+def test_vine_area_0(grapevine):
+    grapevine.insert(0)
+    grapevine.insert(5)
+    grapevine.insert(10)
+    grapevine.insert(15)
+    assert grapevine.area() == 12
+    grapevine.next()
+    grapevine.insert(2)
+    assert grapevine.area() == 6
+    grapevine.insert(7)
+    assert grapevine.area() == 5
+
+def test_vine_area_1(grapevine):
+    grapevine.insert(15)
+    grapevine.next()
+    grapevine.insert(1)
+    grapevine.insert(4)
+    grapevine.insert(6)
+    grapevine.insert(9)
+    assert grapevine.area() == -2
+    grapevine.insert(12)
+    assert grapevine.area() == -3
+
 def test_vine_buds(grapevine):
     size = grapevine.size * grapevine.size
     assert len(list(grapevine.buds())) == size + 1
@@ -164,6 +187,20 @@ def test_vine_null(grapevine):
     assert len(list(grapevine.buds())) == size - 2
     grapevine.move(16)
     assert grapevine.null == 2
+
+def test_vine_result(grapevine):
+    grapevine.move(1)
+    grapevine.move(14)
+    grapevine.move(4)
+    grapevine.move(11)
+    grapevine.move(5)
+    grapevine.move(10)
+    grapevine.move(6)
+    grapevine.move(9)
+    grapevine.move(7)
+    assert grapevine.result == 1
+    grapevine.move(8)
+    assert grapevine.result == -1
 
 ref_vine_state_b = """[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]"""
 ref_vine_state_w = """[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]"""
