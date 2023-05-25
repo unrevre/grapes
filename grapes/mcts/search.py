@@ -44,6 +44,13 @@ class Search:
         self.root.vine.update()
         self.root.parent = None
 
+    def move(self, action):
+        self.root = next(
+            filter(lambda x: x.action == action, self.root.children)
+        )
+        self.root.vine.update()
+        self.root.parent = None
+
     def extract(self):
         s, p = zip(*self.history)
         r = self.root.vine.result
