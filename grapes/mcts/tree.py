@@ -89,6 +89,10 @@ class Tree:
 
         return self.children[index]
 
+    def inherit(self):
+        self.vine.state = self.parent.vine.state.copy()
+        self.vine.update()
+
     def descend(self):
         node = self
 

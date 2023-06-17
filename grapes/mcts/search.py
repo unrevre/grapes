@@ -41,14 +41,14 @@ class Search:
         _, (_, n) = self.history[-1]
 
         self.root = self.root.children[select(n, temp)]
-        self.root.vine.update()
+        self.root.inherit()
         self.root.parent = None
 
     def move(self, action):
         self.root = next(
             filter(lambda x: x.action == action, self.root.children)
         )
-        self.root.vine.update()
+        self.root.inherit()
         self.root.parent = None
 
     def extract(self):
