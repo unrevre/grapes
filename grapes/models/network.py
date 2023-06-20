@@ -14,27 +14,31 @@ from tensorflow.keras import (
 
 
 class TensorflowNetwork:
-    def __init__(self, **kwargs):
-        groups = (('model',), ('size', 'depth'))
-
-        if all(k in kwargs for k in groups[0]):
-            args = [kwargs[k] for k in groups[0]]
-            self.model = keras.models.load_model(*args)
+    def __init__(self, config):
+        if hasattr(config, 'model'):
+            self.model = keras.models.load_model(config.model)
             return
 
-        if all(k in kwargs for k in groups[1]):
-            args = [kwargs[k] for k in groups[1]]
-            self.model = self.build(*args)
+        attrs = ('size', 'depth', 'nfilt', 'ksize', 'nres')
+        if all(hasattr(config, k) for k in attrs):
+            self.model = self.build(config)
             return
 
         raise KeyError
 
-    def build(self, size, depth):
+    def build(self, config):
+        size = config.size
+        depth = config.depth
+
+        nfilt, nfiltp, nfiltv = config.nfilt
+        ksize = config.ksize
+        nres = config.nres
+
         inputs = keras.Input(shape=(size, size, depth * 2 + 1))
 
         x = layers.Conv2D(
-            8,
-            3,
+            nfilt,
+            ksize,
             padding="same",
             data_format="channels_last",
             kernel_regularizer=regularizers.L2(1e-4),
@@ -43,12 +47,12 @@ class TensorflowNetwork:
         x = layers.BatchNormalization(axis=1, name='n')(x)
         x = layers.Activation(activations.relu, name='a')(x)
 
-        for i in range(1):
+        for i in range(nres):
             y = x
 
             x = layers.Conv2D(
-                8,
-                3,
+                nfilt,
+                ksize,
                 padding="same",
                 data_format="channels_last",
                 kernel_regularizer=regularizers.L2(1e-4),
@@ -57,8 +61,8 @@ class TensorflowNetwork:
             x = layers.BatchNormalization(axis=1, name='n0{}'.format(i))(x)
             x = layers.Activation(activations.relu, name='a0{}'.format(i))(x)
             x = layers.Conv2D(
-                8,
-                3,
+                nfilt,
+                ksize,
                 padding="same",
                 data_format="channels_last",
                 kernel_regularizer=regularizers.L2(1e-4),
@@ -69,7 +73,7 @@ class TensorflowNetwork:
             x = layers.Activation(activations.relu, name='a1{}'.format(i))(x)
 
         p = layers.Conv2D(
-            8,
+            nfiltp,
             1,
             data_format="channels_last",
             kernel_regularizer=regularizers.L2(1e-4),
@@ -86,7 +90,7 @@ class TensorflowNetwork:
         p = layers.Activation(activations.softmax, name='softmax')(p)
 
         v = layers.Conv2D(
-            4,
+            nfiltv,
             1,
             data_format="channels_last",
             kernel_regularizer=regularizers.L2(1e-4),
